@@ -14,23 +14,18 @@ var fs = require('fs');
 
 var sourceDir, targetDir;
 
+var swapSlashes = function(originalPath) {
+    return originalPath.replace('\\', '/');
+}
+
 if (process.argv[2]) {
-    sourceDir = process.argv[2].replace('\\','/');
+    sourceDir = swapSlashes(process.argv[2]);
 }
 
 if (process.argv[3]) {
-    targetDir = process.argv[3].replace('\\','/');
+    targetDir = swapSlashes(process.argv[3]);
 }
 
-//console.log('Source Dir: ' + sourceDir);
-//console.log('Target Dir: ' + targetDir);
-
-//var filesAndStuff = fs.readdirSync(sourceDir + '/site-data');
-/*
-for (i=0; i < filesAndStuff.length; i++) {
-    console.log(filesAndStuff[i]);
-}
-*/
 var siteInfo = JSON.parse(fs.readFileSync(sourceDir + '/site-data/site.json', 'utf8'));
 
 console.log(siteInfo.Title);
@@ -70,6 +65,14 @@ var processFile = function(path, fileName, level) {
         } else {
             if(thisFileName.substr(-5) == '.json') {
                 console.log(levelPadding + 'Found a json file: ' + thisFileName);
+               
+                var pageInfo = JSON.parse(fs.readFileSync(thisFileName, 'utf8'));
+
+                if(pageInfo.title) {
+                    console.log(levelPadding + pageInfo.title);
+                }
+                pageInfo = null;
+
             } else if (thisFileName.substr(-3) == '.md') {
                 console.log(levelPadding + 'Found a markdown file: ' + thisFileName);
             } else if (thisFileName.substr(-5) == '.html') {
