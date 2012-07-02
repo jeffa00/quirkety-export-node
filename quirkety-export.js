@@ -17,6 +17,9 @@
  * *********************************************** */
 
 var fs = require('fs'); // filesystem library
+var mu = require('mu2');// Mustache templating library
+var wrench = require('wrench'), // Wrench file library
+    util = require('util'); 
 var siteInfo = "";      // JSON file with site specific meta-data
 var templates = [];     // List of available templates 
 var lvl = 0;            // Indentation level used during recursion
@@ -76,6 +79,8 @@ var processFile = function(path, fileName, level) {
             }
         } else {
             if(thisFileName.substr(-5) == '.json') {
+                // If we have a JSON file, we should see if we can match
+                // it with an md or html file, then apply the template
                 console.log(levelPadding + 'Found a json file: ' + thisFileName);
             }else {
                 console.log(levelPadding + 'Found a different file: ' + thisFileName);
@@ -103,6 +108,14 @@ var loadTemplates = function(path) {
     return templates;
 }
 
+var moveStaticContent = function(basePath){
+    wrench.copyDirSyncRecursive(basePath + '/site-static-elements/', basePath + '/www/.');    
+}
+
+var deleteExistingExportDir = function(basePath) {
+    wrench.rmdirSyncRecursive(basePath + '/www', true);
+}
+
 /* Begin processing *********************************
  * */
 
@@ -113,6 +126,8 @@ if (process.argv[2]) {
     templates = loadTemplates(sourceDir + '/template/');
     console.log(siteInfo.Title);
     console.log('');
+    deleteExistingExportDir(sourceDir);
+    moveStaticContent(sourceDir);
     processFile(sourceDir + '/site-data/', '', lvl);
 } else {
     console.log('You must specify a source directory');
