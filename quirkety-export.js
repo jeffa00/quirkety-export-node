@@ -90,20 +90,50 @@ var processFile = function(basePath, path, fileName, level) {
                 // it with an md or html file, then apply the template
                 console.log(levelPadding + 'Found a json file: ' + thisFileName);
                 
+                try {
                 var pageMetaData = JSON.parse(fs.readFileSync(thisFileName, 'utf8'));
 
-                var mdFileName = thisFileName.replace('.json','.md');
-                var htmlFileName = thisFileName.replace('.json','.html');
-                var contentsFileName = '';
-                var fileContents;
-                var fileType;
-                //var templateKey = 'default';
-                var outputFileContents;
+                var baseName = pathLib.basename(thisFileName, '.json');
 
-                if (!pageMetaData.template) {
-                    pageMetaData.template = 'default';
+                var matchingFileList = fs.readdirSync(path);  
+
+                for (var i=0; i < matchingFileList.length; i++) {
+                    var matchFile = path + matchingFileList[i];
+
+                    var matchFileStat = fs.statSync(matchFile);
+                    if (matchFile != thisFileName && 
+                            matchFileStat.isFile &&
+                            matchFile.indexOf(baseName) > 0 &&
+                            matchFile.substr(-4) != '.swp' &&
+                            matchFile.substr(-4) != '.swo' &&
+                            matchFile.substr(-1) != '~') {
+                        var baseMatchFileName = pathLib.basename(matchFile);
+                        var fileExt = pathLib.extname(matchFile);
+
+                        var keyName = baseMatchFileName.replace(baseName,'');
+                        keyName = keyName.replace(pathLib.extname(keyName),'');
+                        keyName = keyName.replace('-','');
+
+                        var matchFileContents = fs.readFileSync(matchFile, 'utf8'); 
+
+                        // If it's .md, then run it through the markdown processor
+                        if ( fileExt == '.md') {
+                            matchFileContents = mkd(matchFileContents);
+                        }
+                        pageMetaData[keyName] = matchFileContents;
+                    }
                 }
+                
 
+                //var mdFileName = thisFileName.replace('.json','.md');
+                //var htmlFileName = thisFileName.replace('.json','.html');
+                //var contentsFileName = '';
+                //var fileContents;
+                //var fileType;
+                //var templateKey = 'default';
+                //var outputFileContents;
+
+                /*
                 if (pathLib.existsSync(mdFileName)) {
                     contentsFileName = mdFileName;
                     fileType = 'md';
@@ -115,14 +145,19 @@ var processFile = function(basePath, path, fileName, level) {
                 if (contentsFileName != '') {
                     fileContents = fs.readFileSync(contentsFileName, 'utf8');
                 }
+                */
+
+                if (!pageMetaData.template) {
+                    pageMetaData.template = 'default';
+                }
 
                 var thisTemplate = templates[pageMetaData.template];
                 
-                if (fileType === 'md') {
+                /*if (fileType === 'md') {
                     fileContents = mkd(fileContents);
-                }
+                }*/
 
-                pageMetaData.content = fileContents;
+                //pageMetaData.content = fileContents;
 
                 var newFileName = thisFileName.replace('site-data','www').replace('json','html');;
                 //console.log(thisTemplate);
@@ -130,6 +165,9 @@ var processFile = function(basePath, path, fileName, level) {
 
                 var writeStream = fs.createWriteStream(newFileName);
                 util.pump(renderStream, writeStream);
+                } catch (err) {
+                    var foo = err;
+                }
 
             }else {
                 //console.log(levelPadding + 'Found a different file: ' + thisFileName);
