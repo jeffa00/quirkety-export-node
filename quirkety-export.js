@@ -28,6 +28,10 @@ var lvl = 0;            // Indentation level used during recursion
 
 var sourceDir;          // Base directory where the "magic" happens.
 
+var currentDate = new Date;
+
+var copyrightYear = currentDate.getFullYear();
+
 /* ***************************************************
  *
  * SourceDir/
@@ -92,13 +96,14 @@ var processFile = function(basePath, path, fileName, level) {
                 
                 try {
                 var pageMetaData = JSON.parse(fs.readFileSync(thisFileName, 'utf8'));
+                pageMetaData.copyrightYear = copyrightYear.toString();
 
                 var baseName = pathLib.basename(thisFileName, '.json');
 
                 var matchingFileList = fs.readdirSync(path);  
 
-                for (var i=0; i < matchingFileList.length; i++) {
-                    var matchFile = path + matchingFileList[i];
+                for (var matchIdx=0; matchIdx < matchingFileList.length; matchIdx++) {
+                    var matchFile = path + matchingFileList[matchIdx];
 
                     var matchFileStat = fs.statSync(matchFile);
                     if (matchFile != thisFileName && 
@@ -124,53 +129,23 @@ var processFile = function(basePath, path, fileName, level) {
                     }
                 }
                 
-
-                //var mdFileName = thisFileName.replace('.json','.md');
-                //var htmlFileName = thisFileName.replace('.json','.html');
-                //var contentsFileName = '';
-                //var fileContents;
-                //var fileType;
-                //var templateKey = 'default';
-                //var outputFileContents;
-
-                /*
-                if (pathLib.existsSync(mdFileName)) {
-                    contentsFileName = mdFileName;
-                    fileType = 'md';
-                } else if (pathLib.existsSync(htmlFileName)) {
-                    contentsFileName = mdFileName;
-                    fileType = 'html';
-                } 
-                
-                if (contentsFileName != '') {
-                    fileContents = fs.readFileSync(contentsFileName, 'utf8');
-                }
-                */
-
                 if (!pageMetaData.template) {
                     pageMetaData.template = 'default';
                 }
 
                 var thisTemplate = templates[pageMetaData.template];
                 
-                /*if (fileType === 'md') {
-                    fileContents = mkd(fileContents);
-                }*/
-
-                //pageMetaData.content = fileContents;
-
                 var newFileName = thisFileName.replace('site-data','www').replace('json','html');;
-                //console.log(thisTemplate);
+
                 var renderStream = mu.renderText(thisTemplate, pageMetaData, {});
 
                 var writeStream = fs.createWriteStream(newFileName);
                 util.pump(renderStream, writeStream);
                 } catch (err) {
-                    var foo = err;
+                    console.log(levelPadding + 'Error: ' + err);
                 }
 
             }else {
-                //console.log(levelPadding + 'Found a different file: ' + thisFileName);
             }
         }
     }
@@ -201,7 +176,6 @@ var moveStaticContent = function(basePath){
 
 var deleteExistingExportDir = function(basePath) {
     wrench.rmdirSyncRecursive(basePath + '/www', true);
-    //fs.rmdirSync(basePath + '/www');
 }
 
 /* Configure marked *********************************
@@ -210,7 +184,7 @@ var configureMarked = function() {
     mkd.setOptions({
         gfm: true,
         pedantic: false,
-        sanitize: true,
+        sanitize: false,
         highlight: function(code, lang) {
             if (lang === 'js') {
                 return javascriptHighlighter(code);
