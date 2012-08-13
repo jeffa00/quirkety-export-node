@@ -35,11 +35,11 @@ var copyrightYear = currentDate.getFullYear();
 /* ***************************************************
  *
  * SourceDir/
- *     ant-build-script <- HTML5 Boilerplate build script <- Optional
+ *     ant-build-script <- HTML5 Boilerplate build script
  *     site-data <- Structure via dirs and json + md or html
  *     site-static-elements <- images, scripts, etc.
  *     template  <- Base HTML with Mustache place holders
- *     www       <- Output directory suitable for publishing (mostly)
+ *     www       <- Output directory suitable for publishing (almost)
  *  ************************************************** */
 
 var processFile = function(basePath, path, fileName, level) {
@@ -102,8 +102,8 @@ var processFile = function(basePath, path, fileName, level) {
 
                 var matchingFileList = fs.readdirSync(path);  
 
-                for (var matchIdx=0; matchIdx < matchingFileList.length; matchIdx++) {
-                    var matchFile = path + matchingFileList[matchIdx];
+                for (var i=0; i < matchingFileList.length; i++) {
+                    var matchFile = path + matchingFileList[i];
 
                     var matchFileStat = fs.statSync(matchFile);
                     if (matchFile != thisFileName && 
