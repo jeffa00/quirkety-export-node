@@ -3,8 +3,8 @@
  *
  * ©2012 Jeff Ammons
  *
- * Quirkety is a half-baked blog thing that stores it's
- * meta data as json and it's content as either markdown or html.
+ * Quirkety is a half-baked blog thing that stores its
+ * meta data as json and its content as either markdown or html.
  *
  * It uses mustache for templating.
  *
