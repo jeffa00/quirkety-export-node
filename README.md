@@ -32,11 +32,11 @@ Next get this project.
 
 When you are ready to run it, just run this command:
 
-node quirkety-export <path to your source directory>
+    node quirkety-export <path to your source directory>
 
 For example:
 
-node quirkety-export c:\myProject
+    node quirkety-export c:\myProject
 
 ## Whoa, What's All This About A Source Project Directory Thingy?
 When you run Quirkety Export, it will spin through the directory you give it and do the following:
