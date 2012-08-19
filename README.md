@@ -65,18 +65,18 @@ The important thing to remember is that your URL structure will be based on your
 
 In other words http://www.mysite.com/blog/my-first-blog-page would look like this:
 
-SourceDir/
-    site-data/
-        blog/
-            index.json
-            index-content.md
+    SourceDir/
+        site-data/
+            blog/
+                index.json
+                index-content.md
 
 The result in the www folder will be:
 
-SourceDir/
-    www/
-        blog/
-            index.html
+    SourceDir/
+        www/
+            blog/
+                index.html
 
 That means both these URLs will work (if your web server considers index.html to be the default file):
 
