@@ -93,22 +93,22 @@ It will read the md file in, run it through the markdown processor to generate H
 
 That means you could have something like this:
 
-index.json
-index-content.md
-index-otherContent.md
-index-stillYetMoreContent.md
+    index.json
+    index-content.md
+    index-otherContent.md
+    index-stillYetMoreContent.md
 
 That would make properties called:
 
-content
-otherContent
-stillYetMoreContent
+    content
+    otherContent
+    stillYetMoreContent
 
 If you put those into your template like this:
 
-{{&content}}
-{{&otherContent}}
-{{&stillYetMoreContent}}
+    {{&content}}
+    {{&otherContent}}
+    {{&stillYetMoreContent}}
 
 then the Mustache template engine will put the resulting HTML in those spots.
 
@@ -116,7 +116,9 @@ Notice the ampersand in there. That tells the Mustache engine to NOT HTML encode
 
 If you are inserting plain text, then you don't need the ampersand.
 
-{{title}} for instance.
+    {{title}} 
+
+for instance.
 
 This gives you quite a bit of freedom.
 
