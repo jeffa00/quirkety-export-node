@@ -8,7 +8,7 @@ This is my first attempt with Node, so don't expect the code to look great. In f
 ## Why Would I Use This?
 You probably wouldn't. There are a ton of great CMS apps and blog engines out there. Heck if nothing exisited but Word Press, I'd point you towards it instead of this.
 
-The problem with all those apps is that they assemble web pages from static content and database records each time someone looks at the page (minus anything cacheing you are doing, of course). Dynamic content like that takes time to assemble.
+The problem with all those apps is that they assemble web pages from static content and database records each time someone looks at the page (minus anything cacheing related you are doing, of course). Dynamic content like that takes time to assemble.
 
 In most cases this is necessary, but not always.
 
