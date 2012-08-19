@@ -125,3 +125,5 @@ This gives you quite a bit of freedom.
 If you want to put "editor":"John Doh" in the index.json, then you can put {{editor}} in your HTML template and be away to the races.
 
 Or you could create an index-editor.md file. You just couldn't do both successfully...
+
+
