@@ -45,21 +45,21 @@ When you run Quirkety Export, it will spin through the directory you give it and
 2. Copy static elements to the www directory.
 3. Load templates into memory
 3. Spin through the site-data directory and all subdirectories
-  A. Look for *.json files
-  B. Look for matching files
-  C. Processing md files into HTML
-  D. Apply content to templates to generate output files
-  E. Export HTML files to appropriate places
+  1. Look for *.json files
+  2. Look for matching files
+  3. Processing md files into HTML
+  4. Apply content to templates to generate output files
+  5. Export HTML files to appropriate places
 
 ## What Goes In My Source Project Directory Thingy?
 Basically three required directories, one optional directory, and a whole lot of json, md or html files.
 
-+ SourceDir/
-+   ant-build-script     <- HTML5 Boilerplate build script <- Optional
-+   site-data            <- Structure via dirs and json + md or html
-+   site-static-elements <- images, scripts, etc.
-+   template             <- Base HTML with Mustache place holders
-+   www                  <- Output directory suitable for publishing (mostly)
+     SourceDir/
+       ant-build-script     <- HTML5 Boilerplate build script <- Optional
+       site-data            <- Structure via dirs and json + md or html
+       site-static-elements <- images, scripts, etc.
+       template             <- Base HTML with Mustache place holders
+       www                  <- Output directory suitable for publishing (mostly)
 
 The important thing to remember is that your URL structure will be based on your directory structure in your site-data and site-static-elements directories.
 
