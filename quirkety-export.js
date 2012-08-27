@@ -16,21 +16,18 @@
  * it to look horrifying.
  * *********************************************** */
 
-var fs = require('fs'); // filesystem library
-var pathLib = require('path'); // path library
-var mu = require('mu2');// Mustache templating library
-var mkd = require('marked'); // Marked markdown library
-var wrench = require('wrench'), // Wrench file library
-    util = require('util'); 
-var siteInfo = "";      // JSON file with site specific meta-data
-var templates = [];     // List of available templates 
-var lvl = 0;            // Indentation level used during recursion
-
-var sourceDir;          // Base directory where the "magic" happens.
-
-var currentDate = new Date;
-
-var copyrightYear = currentDate.getFullYear();
+var fs        = require('fs'), // filesystem library
+    pathLib   = require('path'), // path library
+    mu        = require('mu2'), // Mustache templating library
+    mkd       = require('marked'), // Marked markdown library
+    wrench    = require('wrench'), // Wrench file library
+    util      = require('util'), 
+    siteInfo  = "",     // JSON file with site specific meta-data
+    templates = [],     // List of available templates 
+    lvl       = 0,      // Indentation level used during recursion
+    sourceDir,          // Base directory where the "magic" happens.
+    currentDate = new Date,
+    copyrightYear = currentDate.getFullYear();
 
 /* ***************************************************
  *
@@ -93,62 +90,86 @@ var processFile = function(basePath, path, fileName, level) {
                 // If we have a JSON file, we should see if we can match
                 // it with an md or html file, then apply the template
                 console.log(levelPadding + 'Found a json file: ' + thisFileName);
-                
+
                 try {
-                var pageMetaData = JSON.parse(fs.readFileSync(thisFileName, 'utf8'));
-                pageMetaData.copyrightYear = copyrightYear.toString();
-
-                var baseName = pathLib.basename(thisFileName, '.json');
-
-                var matchingFileList = fs.readdirSync(path);  
-
-                for (var matchIdx=0; matchIdx < matchingFileList.length; matchIdx++) {
-                    var matchFile = path + matchingFileList[matchIdx];
-
-                    var matchFileStat = fs.statSync(matchFile);
-                    if (matchFile != thisFileName && 
-                            matchFileStat.isFile &&
-                            matchFile.indexOf(baseName) > 0 &&
-                            matchFile.substr(-4) != '.swp' &&
-                            matchFile.substr(-4) != '.swo' &&
-                            matchFile.substr(-1) != '~') {
-                        var baseMatchFileName = pathLib.basename(matchFile);
-                        var fileExt = pathLib.extname(matchFile);
-
-                        var keyName = baseMatchFileName.replace(baseName,'');
-                        keyName = keyName.replace(pathLib.extname(keyName),'');
-                        keyName = keyName.replace('-','');
-
-                        var matchFileContents = fs.readFileSync(matchFile, 'utf8'); 
-
-                        // If it's .md, then run it through the markdown processor
-                        if ( fileExt == '.md') {
-                            matchFileContents = mkd(matchFileContents);
-                        }
-                        pageMetaData[keyName] = matchFileContents;
+                    var pageMetaData = JSON.parse(fs.readFileSync(thisFileName, 'utf8'));
+                    pageMetaData.copyrightYear = copyrightYear.toString();
+                    
+                    if (pageMetaData.SummarizeDir)
+                    {
+                        // **************************************************************
+                        // Go fetch the contents of any directories listed this way
+                        //
+                        // If we put a tag for SummarizedContent in our template,
+                        // mustache will render it out.
+                        //
+                        // To be really, really useful this should page the data,
+                        // but I don't really need that at the moment.
+                        var summaryData = loadSummaries(pageMetaData.SummarizeDir);
+                        pageMetaData.SummarizedContent = summaryData;
                     }
-                }
-                
-                if (!pageMetaData.template) {
-                    pageMetaData.template = 'default';
-                }
+                    var baseName = pathLib.basename(thisFileName, '.json');
 
-                var thisTemplate = templates[pageMetaData.template];
-                
-                var newFileName = thisFileName.replace('site-data','www').replace('json','html');;
+                    var matchingFileList = fs.readdirSync(path);  
 
-                var renderStream = mu.renderText(thisTemplate, pageMetaData, {});
+                    for (var matchIdx=0; matchIdx < matchingFileList.length; matchIdx++) {
+                        var matchFile = path + matchingFileList[matchIdx];
 
-                var writeStream = fs.createWriteStream(newFileName);
-                util.pump(renderStream, writeStream);
+                        var matchFileStat = fs.statSync(matchFile);
+                        if (matchFile != thisFileName && 
+                                matchFileStat.isFile &&
+                                matchFile.indexOf(baseName) > 0 &&
+                                matchFile.substr(-4) != '.swp' &&
+                                matchFile.substr(-4) != '.swo' &&
+                                matchFile.substr(-1) != '~') {
+                                    var baseMatchFileName = pathLib.basename(matchFile);
+                                    var fileExt = pathLib.extname(matchFile);
+
+                                    var keyName = baseMatchFileName.replace(baseName,'');
+                                    keyName = keyName.replace(pathLib.extname(keyName),'');
+                                    keyName = keyName.replace('-','');
+
+                                    var matchFileContents = fs.readFileSync(matchFile, 'utf8'); 
+
+                                    // If it's .md, then run it through the markdown processor
+                                    if ( fileExt == '.md') {
+                                        matchFileContents = mkd(matchFileContents);
+                                    }
+                                    pageMetaData[keyName] = matchFileContents;
+                                }
+                    }
+
+                    if (!pageMetaData.template) {
+                        pageMetaData.template = 'default';
+                    }
+
+                    var thisTemplate = templates[pageMetaData.template];
+
+                    var newFileName = thisFileName.replace('site-data','www').replace('json','html');;
+
+                    var renderStream = mu.renderText(thisTemplate, pageMetaData, {});
+
+                    var writeStream = fs.createWriteStream(newFileName);
+                    util.pump(renderStream, writeStream);
                 } catch (err) {
                     console.log(levelPadding + 'Error: ' + err);
                 }
 
             }else {
+                // What happened? Why am I here?
             }
         }
     }
+}
+
+var loadSummaries = function(path){
+    // Stub here.
+    // The plan is to spin through the directory passed in and
+    // pull in the summary from each .json file, then
+    // pass it through the markdown converter and return
+    // the concatenated list
+    //
+    return 'Sample Data here';
 }
 
 var loadTemplates = function(path) {
@@ -160,8 +181,7 @@ var loadTemplates = function(path) {
     var templateFileList= fs.readdirSync(path);  
     for(var i=0; i < templateFileList.length; i++) {
         var fileName = templateFileList[i];
-        if (fileName.indexOf('.html') > 0 && fileName.indexOf('template') > 0 && fileName.indexOf('~') < 1)
-        {
+        if (fileName.indexOf('.html') > 0 && fileName.indexOf('template') > 0 && fileName.indexOf('~') < 1) {
             var keyName = fileName.substring(0, fileName.indexOf('-'));
             var fileContents = fs.readFileSync(path + fileName, 'utf8');
             templates[keyName] = fileContents; 
@@ -183,15 +203,29 @@ var deleteExistingExportDir = function(basePath) {
 var configureMarked = function() {
     mkd.setOptions({
         gfm: true,
-        pedantic: false,
-        sanitize: false,
-        highlight: function(code, lang) {
-            if (lang === 'js') {
-                return javascriptHighlighter(code);
-            }
-            return code;
+    pedantic: false,
+    sanitize: false,
+    highlight: function(code, lang) {
+        if (lang === 'js') {
+            return javascriptHighlighter(code);
+        }
+        return code;
+    }
+    });
+}
+
+var createExportDir = function(basePath){
+    if (!fs.existsSync(basePath + '/www'))
+    {
+        fs.mkdirSync(basePath + '/www');
+    }
+/*
+    fs.existsSync(basePath + '/www', function (exists) {
+        if (!exists) {
+            fs.mkdirSync(basePath + '/www');
         }
     });
+*/
 }
 
 /* Begin processing *********************************
@@ -200,12 +234,17 @@ var configureMarked = function() {
 // If a dir was passed in, use it, else report error and bail.
 if (process.argv[2]) {
     sourceDir = process.argv[2].replace('\\','/');
+
+    // ******* Process optional params
+    //
+      
     configureMarked();
     siteInfo = JSON.parse(fs.readFileSync(sourceDir + '/site-data/site.json', 'utf8'));
     templates = loadTemplates(sourceDir + '/template/');
     console.log(siteInfo.Title);
     console.log('');
     deleteExistingExportDir(sourceDir);
+    createExportDir(sourceDir); 
     moveStaticContent(sourceDir);
     processFile(sourceDir, sourceDir + '/site-data/', '', lvl);
 } else {
